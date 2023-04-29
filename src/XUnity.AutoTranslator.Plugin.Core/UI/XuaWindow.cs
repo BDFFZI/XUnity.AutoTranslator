@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
 
@@ -11,7 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    {
       private const int WindowId = 5464332;
       private const float WindowHeight = 596;
-      private const float WindowWidth = 320;
+      private const float WindowWidth = 340;
 
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
 
@@ -126,11 +127,40 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             }
 
             // GROUP
-            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 2 ) + ( GUIUtil.ComponentSpacing * 2 );
+            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 3 ) + ( GUIUtil.ComponentSpacing * 3 );
             GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
 
             GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Select a Translator ----", GUIUtil.LabelCenter );
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+            //防垃圾邮件机制
+           
+            {
+               if( AutoTranslationPlugin.Current.TranslationManager.CurrentEndpoint != null )
+               {
+                  float delay = AutoTranslationPlugin.Current.TranslationManager.CurrentEndpoint.TranslationDelay;
+
+                  Rect rect = GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight );
+                  GUI.Label( rect, GUIUtil.CreateContent( "翻译延迟", "注意，翻译的频率过快可能会被服务器识别为网络攻击而被加入黑名单（需要申请账号的翻译器一般不会被拉黑），所以遇到比如galgame快进导致字幕经常变化的情况，这时一定要延迟，防止频繁触发。" ) );
+                  rect.x += rect.width;
+                  GUI.Label( rect, delay.ToString() );
+                  rect.x += rect.width;
+                  delay = GUI.HorizontalSlider( GUIUtil.R( rect.x, posy, col2 - rect.width, GUIUtil.LabelHeight ),
+                      delay, 0, 1 );
+                  posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+                  AutoTranslationPlugin.Current.TranslationManager.CurrentEndpoint.TranslationDelay = delay;
+               }
+               else
+               {
+                  Rect rect = GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight );
+                  GUI.Label( rect, GUIUtil.CreateContent( "翻译延迟", "注意，翻译的频率过快可能会被服务器识别为网络攻击而被加入黑名单（需要申请账号的翻译器一般不会被拉黑。），所以遇到比如galgame快进导致字幕经常变化的情况，这时一定要延迟，防止频繁触发。" ) );
+                  rect.x += rect.width;
+                  rect.width = col2;
+                  GUI.Label( rect,"未设置主翻译器" );
+                  posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+               }
+            }
 
             GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth + 10, GUIUtil.LabelHeight ), "Translator: " );
             float endpointDropdownPosy = posy;
