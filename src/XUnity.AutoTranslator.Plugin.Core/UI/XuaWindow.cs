@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    internal class XuaWindow
    {
       private const int WindowId = 5464332;
-      private const float WindowHeight = 596;
+      private const float WindowHeight = 596 + 40;
       private const float WindowWidth = 340;
 
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          Input.ResetInputAxes();
       }
-      
+
       private void CreateWindowUI( int id )
       {
          try
@@ -124,6 +124,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                   posx += GUIUtil.ComponentSpacing + buttonWidth;
                }
                posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+               posx = GUIUtil.ComponentSpacing;
             }
 
             // GROUP
@@ -141,7 +142,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                   float delay = AutoTranslationPlugin.Current.TranslationManager.CurrentEndpoint.TranslationDelay;
 
                   Rect rect = GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight );
-                  GUI.Label( rect, GUIUtil.CreateContent( "翻译延迟", "注意，翻译的频率过快可能会被服务器识别为网络攻击而被加入黑名单（需要申请账号的翻译器一般不会被拉黑），所以遇到比如galgame快进导致字幕经常变化的情况，这时一定要延迟，防止频繁触发。" ) );
+                  GUI.Label( rect, GUIUtil.CreateContent( "翻译延迟", "注意，翻译的频率过快可能会被服务器识别为网络攻击而被加入黑名单（需要申请账号的翻译器一般不会被拉黑），所以遇到比如galgame字幕渐出或快进导致经常变化的情况，这时一定要延迟，防止频繁触发。（你不延迟，插件的安全机制就会出手，直接停止服务）" ) );
                   rect.x += rect.width;
                   GUI.Label( rect, delay.ToString() );
                   rect.x += rect.width;
@@ -154,7 +155,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                else
                {
                   Rect rect = GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight );
-                  GUI.Label( rect, GUIUtil.CreateContent( "翻译延迟", "注意，翻译的频率过快可能会被服务器识别为网络攻击而被加入黑名单（需要申请账号的翻译器一般不会被拉黑。），所以遇到比如galgame快进导致字幕经常变化的情况，这时一定要延迟，防止频繁触发。" ) );
+                  GUI.Label( rect, GUIUtil.CreateContent( "翻译延迟", "注意，翻译的频率过快可能会被服务器识别为网络攻击而被加入黑名单（需要申请账号的翻译器一般不会被拉黑），所以遇到比如galgame字幕渐出或快进导致经常变化的情况，这时一定要延迟，防止频繁触发。（你不延迟，插件的安全机制就会出手，直接停止服务）" ) );
                   rect.x += rect.width;
                   rect.width = col2;
                   GUI.Label( rect,"未设置主翻译器" );

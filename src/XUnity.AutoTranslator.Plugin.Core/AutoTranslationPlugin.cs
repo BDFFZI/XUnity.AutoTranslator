@@ -322,20 +322,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             new List<ToggleViewModel>
             {
                new ToggleViewModel(
-                  " Translated",
-                  "<b>TRANSLATED</b>\nThe plugin currently displays translated texts. Disabling this does not mean the plugin will no longer perform translations, just that they will not be displayed.",
-                  "<b>NOT TRANSLATED</b>\nThe plugin currently displays untranslated texts.",
+                  " 显示翻译",
+                  "<b>显示中</b>\n该选项表示是否显示翻译后的文本。注意，禁用此功能后依旧会执行翻译，只是它们不会显示翻译结果而已。（想要关闭翻译，把翻译端点都设空即可）",
+                  "<b>不显示</b>\n当前不会显示翻译后的文本。",
                   ToggleTranslation, () => _isInTranslatedMode ),
+               new ToggleViewModel(
+                  " 查看翻译",
+                  "<b>显示中</b>\n已显示翻译窗口，你可以利用Copy按钮并配合“编辑翻译”功能，调整翻译结果。",
+                  "<b>不显示</b>\n翻译窗口关闭中。",
+                  ToggleTranslationAggregator, () => TranslationAggregatorWindow != null && TranslationAggregatorWindow.IsShown ),
                new ToggleViewModel(
                   " Silent Logging",
                   "<b>SILENT</b>\nThe plugin will not print out success messages to the log in relation to translations.",
                   "<b>VERBOSE</b>\nThe plugin will print out success messages to the log in relation to translations.",
                   ToggleSilentMode, () => Settings.EnableSilentMode ),
-               new ToggleViewModel(
-                  " Translation Aggregator",
-                  "<b>SHOWN</b>\nThe translation aggregator window is shown.",
-                  "<b>HIDDEN</b>\nThe translation aggregator window is not shown.",
-                  ToggleTranslationAggregator, () => TranslationAggregatorWindow != null && TranslationAggregatorWindow.IsShown ),
             },
             new DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager>(
                "----",
@@ -355,19 +355,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             ),
             new List<ButtonViewModel>
             {
-               new ButtonViewModel( "Reboot", "<b>REBOOT PLUGIN</b>\nReboots the plugin if it has been shutdown. This only works if the plugin was shut down due to consequtive errors towards the translation endpoint.", RebootPlugin, null ),
-               new ButtonViewModel( "Reload", "<b>RELOAD TRANSLATION</b>\nReloads all translation text files and texture files from disk.", ReloadTranslations, null ),
+               new ButtonViewModel( "重启后端", "<b>重启后端</b>\n如果翻译后端已被关闭，则重新启动。该功能用于当翻译端点的因错误而被关闭后希望能重新启动的情况。", RebootPlugin, null ),
+               new ButtonViewModel( "编辑翻译", "<b>打开翻译文件</b>\n当没有翻译进行中时，你可以修改并保存翻译文件以处理一些翻译错误，接着使用“重载翻译”刷新界面。", ()=>{System.Diagnostics.Process.Start(Settings.AutoTranslationsFilePath); }, null ),
+               new ButtonViewModel( "重载翻译", "<b>重新载入翻译文件</b>\n从磁盘重新读取所有翻译文本和翻译图片。", ReloadTranslations, null ),
                new ButtonViewModel( "Hook", "<b>MANUAL HOOK</b>\nTraverses the unity object tree for looking for anything that can be translated. Performs a translation if something is found.", ManualHook, null )
             },
             new List<LabelViewModel>
             {
-               new LabelViewModel( "Version: ", () => PluginData.Version ),
-               new LabelViewModel( "Plugin status: ", () => Settings.IsShutdown ? "Shutdown" : "Running" ),
-               new LabelViewModel( "Translator status: ", GetCurrentEndpointStatus ),
-               new LabelViewModel( "Running translations: ", () => $"{(TranslationManager.OngoingTranslations)}" ),
-               new LabelViewModel( "Served translations: ", () => $"{Settings.TranslationCount} / {Settings.MaxTranslationsBeforeShutdown}" ),
-               new LabelViewModel( "Queued translations: ", () => $"{(TranslationManager.UnstartedTranslations)} / {Settings.MaxUnstartedJobs}" ),
-               new LabelViewModel( "Error'ed translations: ", () => $"{TranslationManager.CurrentEndpoint?.ConsecutiveErrors ?? 0} / {Settings.MaxErrors}"  ),
+               new LabelViewModel( "版本: ", () => PluginData.Version ),
+               new LabelViewModel( "插件状态", () => Settings.IsShutdown ? "已停止" : "运行中" ),
+               new LabelViewModel( "翻译端点状态", GetCurrentEndpointStatus ),
+               new LabelViewModel( "运行中的翻译", () => $"{(TranslationManager.OngoingTranslations)}" ),
+               new LabelViewModel( "已完成的翻译", () => $"{Settings.TranslationCount} / {Settings.MaxTranslationsBeforeShutdown}" ),
+               new LabelViewModel( "等待中的翻译", () => $"{(TranslationManager.UnstartedTranslations)} / {Settings.MaxUnstartedJobs}" ),
+               new LabelViewModel( "发生错误的翻译: ", () => $"{TranslationManager.CurrentEndpoint?.ConsecutiveErrors ?? 0} / {Settings.MaxErrors}"  ),
             } );
       }
 
@@ -389,13 +390,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var endpoint = TranslationManager.CurrentEndpoint;
          if( endpoint == null )
          {
-            return "Not selected";
+            return "没有主翻译端点";
          }
          else if( endpoint.HasFailedDueToConsecutiveErrors )
          {
-            return "Shutdown";
+            return "已停止";
          }
-         return "Running";
+         return "运行中";
       }
 
       private void ValidateConfiguration()
